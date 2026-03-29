@@ -1,29 +1,29 @@
-# DataShield PII Lab
+﻿# DataShield PII Lab
 
 DataShield PII Lab is a local-first privacy engineering project focused on detecting and sanitizing sensitive personal data in structured files. The MVP is designed as a practical defensive security tool for safe data sharing, data minimization, and audit-friendly processing.
 
 ## Project Overview
 
-The tool will read supported input files, detect selected categories of personally identifiable information (PII), classify each match, apply a protection strategy, and write both a sanitized output file and a machine-readable report.
+The tool reads supported input files, detects selected categories of personally identifiable information (PII), classifies each match, applies a protection strategy, and writes both a sanitized output file and a machine-readable report.
 
 ## Features
 
 - Local-first processing with no required external API calls
-- Detection pipeline for common structured PII in CSV and JSON files
+- Detection pipeline for common structured PII in CSV, JSON, and TXT files
 - Sanitization modes for masking and redaction
 - JSON reporting for auditing and analysis
 - Extensible project structure for future PDF, TXT, SQL, and pseudonymization support
 
 ## Supported Formats
 
-Current scaffold target:
+Current MVP support:
 
 - CSV
 - JSON
+- TXT
 
 Planned for later phases:
 
-- TXT
 - PDF
 - SQL exports
 
@@ -64,11 +64,13 @@ Bootstrap check:
 python -m app.main --bootstrap-check
 ```
 
-Future MVP usage target:
+CLI usage:
 
 ```bash
-python -m app.main sanitize samples/sample_customers.csv --mode mask
-python -m app.main sanitize samples/sample_customers.json --mode redact
+python -m app.cli scan samples/sample_customers.csv
+python -m app.cli sanitize samples/sample_customers.csv --mode mask
+python -m app.cli sanitize samples/sample_customers.json --mode redact
+python -m app.cli report samples/sample_customers.csv --mode mask
 ```
 
 ## Architecture
@@ -89,18 +91,20 @@ Sanitized value examples:
 - `+39 3331234567` -> `+39 333****567`
 - `IT60X0542811101000000123456` -> `[REDACTED_IBAN]`
 
-Report output target:
+Report output example:
 
 ```json
 {
   "input_file": "sample_customers.csv",
   "sanitization_mode": "mask",
-  "entities_detected": {
-    "EMAIL": 2,
-    "PHONE": 2,
-    "TAX_CODE": 2,
-    "IBAN": 2
-  }
+  "entities_found": 12,
+  "entity_counts": {
+    "EMAIL": 3,
+    "PHONE": 3,
+    "TAX_CODE": 3,
+    "IBAN": 3
+  },
+  "output_file": "outputs/sample_customers_mask_sanitized.csv"
 }
 ```
 
@@ -113,9 +117,9 @@ Report output target:
 
 ## Limitations
 
-- Phase 1 is a scaffold only; detection and sanitization are not implemented yet
-- Initial detection will rely on regex heuristics and may need refinement
-- CSV and JSON are the only MVP input targets
+- Detection relies on regex heuristics and may need refinement
+- CSV, JSON, and TXT are the only MVP input targets
+- PDF and SQL ingestion are placeholders for later phases
 
 ## Roadmap
 

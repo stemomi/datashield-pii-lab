@@ -71,7 +71,7 @@ def _apply_rule(source: SourceDocument, rule: RegexRule) -> list[DetectedEntity]
         return detections
 
     detections.extend(
-        _scan_scalar(source.content, rule, record_index=None, field_path=("value",))
+        _scan_scalar(source.content, rule, record_index=None, field_path=())
     )
     return detections
 

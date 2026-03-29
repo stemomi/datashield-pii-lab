@@ -26,6 +26,15 @@ def test_write_csv_output(tmp_path: Path) -> None:
     assert rows[1] == "a@example.it,123"
 
 
+def test_write_txt_output(tmp_path: Path) -> None:
+    output_path = tmp_path / "payload.txt"
+    content = "mario.rossi@example.it"
+
+    _write_sanitized_output("txt", content, output_path)
+
+    assert output_path.read_text(encoding="utf-8") == content
+
+
 def test_write_report_output(tmp_path: Path) -> None:
     output_path = tmp_path / "report.json"
     report = {"entities_found": 2}

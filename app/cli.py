@@ -15,6 +15,7 @@ from .core.utils import ensure_directory
 from .detectors.regex_detector import detect_with_regex
 from .ingestors.csv_ingestor import load_csv
 from .ingestors.json_ingestor import load_json
+from .ingestors.txt_ingestor import load_txt
 from .reporting.json_report import build_json_report
 from .transformers.sanitizer import apply_sanitization
 
@@ -85,7 +86,7 @@ def run(argv: list[str] | None = None) -> int:
 
 def _build_orchestrator(transformer) -> PipelineOrchestrator:
     return PipelineOrchestrator(
-        ingestors={"csv": load_csv, "json": load_json},
+        ingestors={"csv": load_csv, "json": load_json, "txt": load_txt},
         detector=detect_with_regex,
         transformer=transformer,
         reporter=build_json_report,
@@ -153,6 +154,9 @@ def _write_sanitized_output(
     if input_format == "json":
         _write_json(content, output_path)
         return
+    if input_format == "txt":
+        _write_txt(content, output_path)
+        return
 
     raise ValueError(f"Unsupported output format: {input_format}")
 
@@ -160,6 +164,12 @@ def _write_sanitized_output(
 def _write_json(content: object, output_path: Path) -> None:
     with output_path.open("w", encoding="utf-8") as handle:
         json.dump(content, handle, ensure_ascii=False, indent=2)
+
+
+def _write_txt(content: object, output_path: Path) -> None:
+    if not isinstance(content, str):
+        content = str(content)
+    output_path.write_text(content, encoding="utf-8")
 
 
 def _write_csv(content: object, output_path: Path) -> None:
@@ -179,5 +189,7 @@ def _write_csv(content: object, output_path: Path) -> None:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+
 if __name__ == "__main__":
     raise SystemExit(run())

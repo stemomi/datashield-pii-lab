@@ -29,7 +29,7 @@ def apply_sanitization(
 
     for detection in detections:
         sanitized = _sanitize_value(detection.value, detection.entity_type, sanitization_mode)
-        _apply_to_content(content, detection.location, detection.value, sanitized)
+        content = _apply_to_content(content, detection.location, detection.value, sanitized)
         applied.append(
             AppliedTransformation(
                 entity=detection,
@@ -52,26 +52,33 @@ def _apply_to_content(
     location: EntityLocation,
     original_value: str,
     sanitized_value: str,
-) -> None:
+) -> object:
     """Apply a sanitized value at the requested field path."""
     target = content
     if location.record_index is not None:
         if isinstance(content, list) and 0 <= location.record_index < len(content):
             target = content[location.record_index]
         else:
-            return
+            return content
 
     if not location.field_path:
-        return
+        if isinstance(target, str):
+            return target.replace(original_value, sanitized_value)
+        return content
+
+    if isinstance(target, str) and location.field_path == ("value",):
+        return target.replace(original_value, sanitized_value)
 
     parent, key = _resolve_parent(target, location.field_path)
     if parent is None:
-        return
+        return content
 
     if isinstance(parent, dict) and isinstance(key, str):
         parent[key] = _sanitize_field(parent.get(key), original_value, sanitized_value)
     elif isinstance(parent, list) and isinstance(key, int) and 0 <= key < len(parent):
         parent[key] = _sanitize_field(parent[key], original_value, sanitized_value)
+
+    return content
 
 
 def _resolve_parent(content: object, field_path: tuple[str | int, ...]) -> tuple[object | None, str | int | None]:

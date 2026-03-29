@@ -5,6 +5,7 @@ from pathlib import Path
 
 from app.ingestors.csv_ingestor import load_csv
 from app.ingestors.json_ingestor import load_json
+from app.ingestors.txt_ingestor import load_txt
 
 
 def test_load_csv_reads_rows(tmp_path: Path) -> None:
@@ -48,3 +49,12 @@ def test_load_json_records_key(tmp_path: Path) -> None:
     data = load_json(json_path)
 
     assert data == [{"email": "anna@example.it"}]
+
+
+def test_load_txt_reads_text(tmp_path: Path) -> None:
+    txt_path = tmp_path / "sample.txt"
+    txt_path.write_text("mario.rossi@example.it", encoding="utf-8")
+
+    text = load_txt(txt_path)
+
+    assert text == "mario.rossi@example.it"
