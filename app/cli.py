@@ -27,7 +27,9 @@ def run(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.bootstrap_check:
-        print(f"{APP_NAME} scaffold is ready. Next roadmap step: CSV ingestion.")
+        print(
+            f"{APP_NAME} scaffold is ready. Core pipeline architecture is available for concrete integrations."
+        )
         return 0
 
     parser.print_help()
