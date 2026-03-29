@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from app.cli import _write_json, _write_report, _write_sanitized_output
+from app.core.models import ReportFormat
 
 
 def test_write_json_output(tmp_path: Path) -> None:
@@ -35,10 +36,19 @@ def test_write_txt_output(tmp_path: Path) -> None:
     assert output_path.read_text(encoding="utf-8") == content
 
 
+def test_write_pdf_output(tmp_path: Path) -> None:
+    output_path = tmp_path / "payload.pdf"
+    content = "mario.rossi@example.it"
+
+    _write_sanitized_output("pdf", content, output_path)
+
+    assert output_path.read_text(encoding="utf-8") == content
+
+
 def test_write_report_output(tmp_path: Path) -> None:
     output_path = tmp_path / "report.json"
     report = {"entities_found": 2}
 
-    _write_report(report, output_path)
+    _write_report(report, output_path, ReportFormat.JSON)
 
     assert json.loads(output_path.read_text(encoding="utf-8")) == report

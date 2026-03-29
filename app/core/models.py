@@ -28,12 +28,14 @@ class SanitizationMode(StrEnum):
 
     MASK = "mask"
     REDACT = "redact"
+    PSEUDONYMIZE = "pseudonymize"
 
 
 class ReportFormat(StrEnum):
     """Supported audit report formats."""
 
     JSON = "json"
+    HTML = "html"
 
 
 @dataclass(slots=True, frozen=True)
@@ -124,7 +126,7 @@ class PipelineResult:
     source: SourceDocument
     detections: tuple[DetectedEntity, ...]
     transform_result: TransformResult
-    report: dict[str, Any]
+    report: dict[str, Any] | str
     sanitized_output_path: Path
     report_output_path: Path
 

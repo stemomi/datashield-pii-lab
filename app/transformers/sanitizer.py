@@ -15,7 +15,10 @@ from ..core.models import (
 )
 from ..core.utils import clone_structured_data
 from .masker import mask_value
+from .pseudonymizer import Pseudonymizer
 from .redactor import redact_value
+
+_PSEUDONYMIZER = Pseudonymizer()
 
 
 def apply_sanitization(
@@ -44,6 +47,8 @@ def apply_sanitization(
 def _sanitize_value(value: str, entity_type: object, mode: SanitizationMode) -> str:
     if mode is SanitizationMode.REDACT:
         return redact_value(value, entity_type)
+    if mode is SanitizationMode.PSEUDONYMIZE:
+        return _PSEUDONYMIZER.pseudonymize(value, entity_type)
     return mask_value(value, entity_type)
 
 

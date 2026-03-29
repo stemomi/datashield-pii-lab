@@ -6,6 +6,7 @@ from pathlib import Path
 from app.ingestors.csv_ingestor import load_csv
 from app.ingestors.json_ingestor import load_json
 from app.ingestors.txt_ingestor import load_txt
+from app.ingestors.pdf_ingestor import load_pdf
 
 
 def test_load_csv_reads_rows(tmp_path: Path) -> None:
@@ -58,3 +59,10 @@ def test_load_txt_reads_text(tmp_path: Path) -> None:
     text = load_txt(txt_path)
 
     assert text == "mario.rossi@example.it"
+
+
+def test_load_pdf_reads_text() -> None:
+    pdf_path = Path("samples/sample_text.pdf")
+    text = load_pdf(pdf_path)
+
+    assert "mario.rossi@example.it" in text

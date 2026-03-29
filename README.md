@@ -9,23 +9,21 @@ The tool reads supported input files, detects selected categories of personally 
 ## Features
 
 - Local-first processing with no required external API calls
-- Detection pipeline for common structured PII in CSV, JSON, and TXT files
-- Sanitization modes for masking and redaction
-- JSON reporting for auditing and analysis
-- Extensible project structure for future PDF, TXT, SQL, and pseudonymization support
+- Detection pipeline for common structured PII in CSV, JSON, TXT, PDF, and SQL dumps
+- Sanitization modes for masking, redaction, and pseudonymization
+- JSON and HTML reporting for auditing and analysis
+- Optional Presidio integration for advanced entity recognition
+- Batch folder scanning and database query scanning
 
 ## Supported Formats
 
-Current MVP support:
+Current support:
 
 - CSV
 - JSON
 - TXT
-
-Planned for later phases:
-
-- PDF
-- SQL exports
+- PDF (text extraction)
+- SQL dumps
 
 ## Supported PII Types
 
@@ -47,6 +45,7 @@ Planned for later phases:
 
 - `mask`: partially hide a value while preserving part of its structure
 - `redact`: replace a value with a labeled placeholder such as `[REDACTED_EMAIL]`
+- `pseudonymize`: deterministic mapping to identifiers such as `EMAIL_001`
 
 ## Installation
 
@@ -71,6 +70,18 @@ python -m app.cli scan samples/sample_customers.csv
 python -m app.cli sanitize samples/sample_customers.csv --mode mask
 python -m app.cli sanitize samples/sample_customers.json --mode redact
 python -m app.cli report samples/sample_customers.csv --mode mask
+```
+
+Batch scan:
+
+```bash
+python -m app.cli batch samples --action scan
+```
+
+Database scan:
+
+```bash
+python -m app.cli db --url "sqlite:///example.db" --query "select * from customers"
 ```
 
 ## Architecture
@@ -118,8 +129,8 @@ Report output example:
 ## Limitations
 
 - Detection relies on regex heuristics and may need refinement
-- CSV, JSON, and TXT are the only MVP input targets
-- PDF and SQL ingestion are placeholders for later phases
+- PDF extraction quality depends on the source document
+- Database support requires SQLAlchemy drivers
 
 ## Roadmap
 
