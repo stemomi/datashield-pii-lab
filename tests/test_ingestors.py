@@ -1,0 +1,50 @@
+﻿from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from app.ingestors.csv_ingestor import load_csv
+from app.ingestors.json_ingestor import load_json
+
+
+def test_load_csv_reads_rows(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sample.csv"
+    csv_path.write_text(
+        "name,email\nMario,mario.rossi@example.it\nAnna,anna@example.it\n",
+        encoding="utf-8",
+    )
+
+    rows = load_csv(csv_path)
+
+    assert rows == [
+        {"name": "Mario", "email": "mario.rossi@example.it"},
+        {"name": "Anna", "email": "anna@example.it"},
+    ]
+
+
+def test_load_json_list_normalization(tmp_path: Path) -> None:
+    payload = [
+        {"email": "mario@example.it"},
+        "just a string",
+        42,
+    ]
+    json_path = tmp_path / "sample.json"
+    json_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    data = load_json(json_path)
+
+    assert data == [
+        {"email": "mario@example.it"},
+        {"value": "just a string"},
+        {"value": 42},
+    ]
+
+
+def test_load_json_records_key(tmp_path: Path) -> None:
+    payload = {"records": [{"email": "anna@example.it"}]}
+    json_path = tmp_path / "records.json"
+    json_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    data = load_json(json_path)
+
+    assert data == [{"email": "anna@example.it"}]

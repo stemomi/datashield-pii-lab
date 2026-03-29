@@ -14,5 +14,8 @@ htmlcov/
 Thumbs.db
 .env
 .tmp/
+.pytest_tmp/
+.pytest_cache/
+tests/.tmp/
 outputs/*
 !outputs/.gitkeep

@@ -179,3 +179,5 @@ def _write_csv(content: object, output_path: Path) -> None:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+if __name__ == "__main__":
+    raise SystemExit(run())

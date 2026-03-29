@@ -54,10 +54,17 @@ def _apply_to_content(
     sanitized_value: str,
 ) -> None:
     """Apply a sanitized value at the requested field path."""
+    target = content
+    if location.record_index is not None:
+        if isinstance(content, list) and 0 <= location.record_index < len(content):
+            target = content[location.record_index]
+        else:
+            return
+
     if not location.field_path:
         return
 
-    parent, key = _resolve_parent(content, location.field_path)
+    parent, key = _resolve_parent(target, location.field_path)
     if parent is None:
         return
 
