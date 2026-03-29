@@ -17,7 +17,7 @@ def load_json(source_path: Path) -> JsonRecord | list[JsonRecord]:
     if source_path.suffix.lower() != ".json":
         raise ValueError(f"Expected a .json file, got: {source_path}")
 
-    with source_path.open(mode="r", encoding="utf-8") as handle:
+    with source_path.open(mode="r", encoding="utf-8-sig") as handle:
         payload = json.load(handle)
 
     return _normalize_json(payload)
