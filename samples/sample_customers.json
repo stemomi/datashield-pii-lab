@@ -1,0 +1,29 @@
+﻿[
+  {
+    "record_id": 1,
+    "full_name": "Mario Rossi",
+    "email": "mario.rossi@gmail.com",
+    "phone": "+39 3331234567",
+    "tax_code": "RSSMRA85M01H501Z",
+    "iban": "IT60X0542811101000000123456",
+    "notes": "Synthetic training record"
+  },
+  {
+    "record_id": 2,
+    "full_name": "Anna Bianchi",
+    "email": "anna.bianchi@example.it",
+    "phone": "+39 3477654321",
+    "tax_code": "BNCNNA90A41F205X",
+    "iban": "IT40S0300203280280000400235",
+    "notes": "Synthetic demo data"
+  },
+  {
+    "record_id": 3,
+    "full_name": "Luca Verdi",
+    "email": "luca.verdi@demo.local",
+    "phone": "+39 3205557788",
+    "tax_code": "VRDLCU88T10H501Q",
+    "iban": "IT18A0200803244000104005823",
+    "notes": "Local-first privacy sample"
+  }
+]
