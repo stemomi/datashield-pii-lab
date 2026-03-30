@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datashield-pii-lab"
+version = "0.1.0"
+description = "Local-first PII detection, sanitization, and audit reporting for structured data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+  { name = "stemomi" },
+]
+keywords = ["privacy", "pii", "security", "sanitization", "csv", "json"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "pypdf>=4.2,<5.0",
+  "pyyaml>=6.0,<7.0",
+  "presidio-analyzer>=2.2,<3.0",
+  "sqlalchemy>=2.0,<3.0",
+]
+
+[project.optional-dependencies]
+db = [
+  "psycopg2-binary>=2.9,<3.0",
+  "pymysql>=1.1,<2.0",
+]
+dev = [
+  "pytest>=8.0,<9.0",
+]
+
+[project.scripts]
+datashield = "app.cli:run"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
