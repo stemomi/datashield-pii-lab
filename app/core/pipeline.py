@@ -107,7 +107,7 @@ class PipelineOrchestrator:
 
     def run(self, request: PipelineRequest) -> PipelineResult:
         """Execute the pipeline from input read to report generation."""
-        source_path = resolve_input_path(request.input_path)
+        source_path = self._resolve_source_path(request)
         source_format = self._resolve_source_format(request, source_path)
 
         ingestor = self._get_ingestor(source_format)
@@ -154,6 +154,12 @@ class PipelineOrchestrator:
             sanitized_output_path=sanitized_output_path,
             report_output_path=report_output_path,
         )
+
+    def _resolve_source_path(self, request: PipelineRequest) -> Path:
+        """Resolve the request path, allowing virtual sources such as database scans."""
+        if request.source_format and self._normalize_input_format(request.source_format) == "db":
+            return Path(request.input_path).expanduser()
+        return resolve_input_path(request.input_path)
 
     def _resolve_source_format(self, request: PipelineRequest, source_path: Path) -> str:
         """Resolve the source format from the request or file extension."""
@@ -209,3 +215,4 @@ def run_pipeline(
         reporter=reporter,
     )
     return orchestrator.run(request)
+

@@ -84,6 +84,8 @@ Database scan:
 python -m app.cli db --url "sqlite:///example.db" --query "select * from customers"
 ```
 
+The repository includes a demo `example.db` file with a `customers` table for this command.
+
 ## Architecture
 
 The repository is organized around a simple privacy pipeline:
@@ -160,3 +162,4 @@ Next steps:
 - Batch processing improvements and optional dashboard or web UI
 - Custom detection rules and project-level configuration profiles
 - Additional entity families such as organizations, document IDs, and domain-specific records
+

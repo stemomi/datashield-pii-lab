@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 
 from app.cli import run
@@ -74,3 +75,62 @@ def test_cli_report_does_not_claim_sanitized_output(tmp_path: Path, capsys) -> N
     assert report["entity_counts"]["PERSON_NAME"] == 1
     assert report["entity_counts"]["EMAIL"] == 1
     assert not (tmp_path / "customers_mask_sanitized.csv").exists()
+
+
+def test_cli_db_reports_missing_table_cleanly(tmp_path: Path, capsys) -> None:
+    db_path = tmp_path / "empty.db"
+    sqlite3.connect(db_path).close()
+
+    exit_code = run([
+        "db",
+        "--url",
+        f"sqlite:///{db_path}",
+        "--query",
+        "select * from customers",
+    ])
+
+    assert exit_code == 1
+    output = capsys.readouterr().out
+    assert "Database scan failed:" in output
+    assert "no such table: customers" in output
+    assert "currently has no tables" in output
+
+
+def test_cli_db_generates_report_for_sqlite_table(tmp_path: Path, capsys) -> None:
+    db_path = tmp_path / "demo.db"
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            "create table customers (full_name text, email text, ip_address text)"
+        )
+        conn.execute(
+            "insert into customers (full_name, email, ip_address) values (?, ?, ?)",
+            ("Mario Rossi", "mario.rossi@example.it", "192.168.1.42"),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    config_path = _write_cli_config(tmp_path)
+    exit_code = run([
+        "--config",
+        str(config_path),
+        "db",
+        "--url",
+        f"sqlite:///{db_path}",
+        "--query",
+        "select * from customers",
+    ])
+
+    assert exit_code == 0
+    report_path = tmp_path / "demo_mask_report.json"
+    assert report_path.exists()
+    output = capsys.readouterr().out
+    assert "Database scan completed." in output
+
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["input_file"] == "demo.db"
+    assert report["entity_counts"]["PERSON_NAME"] == 1
+    assert report["entity_counts"]["EMAIL"] == 1
+    assert report["entity_counts"]["IP_ADDRESS"] == 1
+    assert report["output_file"] is None

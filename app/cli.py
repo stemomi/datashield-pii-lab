@@ -16,7 +16,7 @@ from .core.utils import ensure_directory
 from .detectors.presidio_detector import detect_with_presidio
 from .detectors.regex_detector import detect_with_regex
 from .ingestors.csv_ingestor import load_csv
-from .ingestors.db_ingestor import load_db
+from .ingestors.db_ingestor import DatabaseQueryError, load_db
 from .ingestors.json_ingestor import load_json
 from .ingestors.pdf_ingestor import load_pdf
 from .ingestors.sql_ingestor import load_sql
@@ -335,7 +335,11 @@ def _handle_db(
     config: CliConfig | None,
 ) -> int:
     mode, report_format, output_dir = _apply_config_defaults(mode, report_format, config)
-    rows = load_db(query, connection_url)
+    try:
+        rows = load_db(query, connection_url)
+    except DatabaseQueryError as exc:
+        print(f"Database scan failed: {exc}")
+        return 1
 
     orchestrator = PipelineOrchestrator(
         ingestors={"db": lambda _: rows},
@@ -346,7 +350,7 @@ def _handle_db(
 
     result = orchestrator.run(
         PipelineRequest(
-            input_path=Path("database"),
+            input_path=_build_db_input_path(connection_url),
             sanitization_mode=mode,
             report_format=report_format,
             output_dir=output_dir,
@@ -360,6 +364,16 @@ def _handle_db(
     print("Database scan completed.")
     print(f"Report file: {result.report_output_path}")
     return 0
+
+
+def _build_db_input_path(connection_url: str) -> Path:
+    """Build a report-friendly source path for database scans."""
+    sqlite_prefix = "sqlite:///"
+    if connection_url.startswith(sqlite_prefix):
+        sqlite_path = connection_url.removeprefix(sqlite_prefix)
+        if sqlite_path:
+            return Path(sqlite_path)
+    return Path("database")
 
 
 def _noop_transformer(source, detections, sanitization_mode) -> TransformResult:
@@ -464,4 +478,6 @@ def _write_csv(content: object, output_path: Path) -> None:
 
 if __name__ == "__main__":
     raise SystemExit(run())
+
+
 
