@@ -13,6 +13,7 @@ The tool reads supported input files, detects selected categories of personally 
 - Regex and field-context detection for names, addresses, dates, and IPs
 - Sanitization modes for masking, redaction, and pseudonymization
 - JSON and HTML reporting for auditing and analysis
+- Minimal GitHub Actions CI to run the automated test suite on pushes and pull requests
 - Optional Presidio integration for advanced entity recognition
 - Batch folder scanning and database query scanning
 
@@ -47,10 +48,54 @@ Current support:
 
 ## Installation
 
+### Quick Start
+
+Windows:
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
+pip install -e ".[dev,db]"
+datashield scan samples/sample_customers.csv
+```
+
+Linux or macOS:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,db]"
+datashield scan samples/sample_customers.csv
+```
+
+### Alternative Setup
+
+Windows:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev,db]"
+```
+
+Linux or macOS:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,db]"
+```
+
+Fallback installation from the requirements files:
+
+```bash
 pip install -r requirements.txt
+```
+
+For local development and tests:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ## Usage Examples
@@ -62,6 +107,15 @@ python -m app.main --bootstrap-check
 ```
 
 CLI usage:
+
+```bash
+datashield scan samples/sample_customers.csv
+datashield sanitize samples/sample_customers.csv --mode mask
+datashield sanitize samples/sample_customers.json --mode redact
+datashield report samples/sample_customers.csv --mode mask
+```
+
+Module-based usage:
 
 ```bash
 python -m app.cli scan samples/sample_customers.csv
@@ -162,4 +216,3 @@ Next steps:
 - Batch processing improvements and optional dashboard or web UI
 - Custom detection rules and project-level configuration profiles
 - Additional entity families such as organizations, document IDs, and domain-specific records
-
