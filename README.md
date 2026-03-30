@@ -10,6 +10,7 @@ The tool reads supported input files, detects selected categories of personally 
 
 - Local-first processing with no required external API calls
 - Detection pipeline for common structured PII in CSV, JSON, TXT, PDF, and SQL dumps
+- Regex and field-context detection for names, addresses, dates, and IPs
 - Sanitization modes for masking, redaction, and pseudonymization
 - JSON and HTML reporting for auditing and analysis
 - Optional Presidio integration for advanced entity recognition
@@ -27,15 +28,12 @@ Current support:
 
 ## Supported PII Types
 
-MVP target entities:
+Current support:
 
 - `EMAIL`
 - `PHONE`
 - `TAX_CODE`
 - `IBAN`
-
-Planned for later phases:
-
 - `BIRTH_DATE`
 - `ADDRESS`
 - `IP_ADDRESS`
@@ -72,6 +70,8 @@ python -m app.cli sanitize samples/sample_customers.json --mode redact
 python -m app.cli report samples/sample_customers.csv --mode mask
 ```
 
+The `report` command writes only the audit report and does not create a sanitized export.
+
 Batch scan:
 
 ```bash
@@ -100,6 +100,10 @@ Sanitized value examples:
 
 - `mario.rossi@gmail.com` -> `m***o.r***i@gmail.com`
 - `+39 3331234567` -> `+39 333****567`
+- `1985-06-14` -> `1**5-**-**`
+- `Via Roma 10` -> `V*a R**a **`
+- `192.168.1.42` -> `192.***.***.42`
+- `Mario Rossi` -> `M***o R***i`
 - `IT60X0542811101000000123456` -> `[REDACTED_IBAN]`
 
 Report output example:
@@ -108,12 +112,16 @@ Report output example:
 {
   "input_file": "sample_customers.csv",
   "sanitization_mode": "mask",
-  "entities_found": 12,
+  "entities_found": 24,
   "entity_counts": {
+    "ADDRESS": 3,
+    "BIRTH_DATE": 3,
     "EMAIL": 3,
+    "IBAN": 3,
+    "IP_ADDRESS": 3,
+    "PERSON_NAME": 3,
     "PHONE": 3,
-    "TAX_CODE": 3,
-    "IBAN": 3
+    "TAX_CODE": 3
   },
   "output_file": "outputs/sample_customers_mask_sanitized.csv"
 }
@@ -128,26 +136,27 @@ Report output example:
 
 ## Limitations
 
-- Detection relies on regex heuristics and may need refinement
+- Detection still relies on heuristics and field context, so false positives and false negatives are possible
+- Name and address detection is intentionally conservative to avoid overmatching
 - PDF extraction quality depends on the source document
 - Database support requires SQLAlchemy drivers
 
 ## Roadmap
 
-Implementation order for the MVP:
+Completed in the current release:
 
-1. Repository setup
-2. CSV ingestor
-3. JSON ingestor
-4. Email regex detection
-5. Phone regex detection
-6. Tax code and IBAN regex detection
-7. Entity model
-8. JSON reporting
-9. Masking
-10. Redaction
-11. Sanitized CSV and JSON export
-12. CLI commands
-13. Tests
-14. Documentation improvements
-15. Extended formats and pseudonymization
+- CSV and JSON ingestion
+- Regex-based detection for identifiers, dates, and IP addresses
+- Field-aware detection for names and addresses
+- Masking, redaction, and baseline pseudonymization
+- Sanitized file export
+- JSON reporting
+- CLI commands and automated tests
+
+Next steps:
+
+- Stronger TXT, PDF, and SQL workflows beyond the current baseline support
+- More advanced Presidio-backed detection profiles
+- Batch processing improvements and optional dashboard or web UI
+- Custom detection rules and project-level configuration profiles
+- Additional entity families such as organizations, document IDs, and domain-specific records

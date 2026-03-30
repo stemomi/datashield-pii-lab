@@ -13,6 +13,33 @@ except ImportError as exc:  # pragma: no cover
 
 from ..core.models import DetectedEntity, EntityLocation, EntityType, SourceDocument
 
+_INTERNAL_TO_PRESIDIO = {
+    EntityType.EMAIL: "EMAIL_ADDRESS",
+    EntityType.PHONE: "PHONE_NUMBER",
+    EntityType.TAX_CODE: "IT_FISCAL_CODE",
+    EntityType.IBAN: "IBAN_CODE",
+    EntityType.BIRTH_DATE: "DATE_TIME",
+    EntityType.ADDRESS: "LOCATION",
+    EntityType.IP_ADDRESS: "IP_ADDRESS",
+    EntityType.PERSON_NAME: "PERSON",
+}
+
+_PRESIDIO_TO_INTERNAL = {
+    "EMAIL_ADDRESS": EntityType.EMAIL,
+    "EMAIL": EntityType.EMAIL,
+    "PHONE_NUMBER": EntityType.PHONE,
+    "PHONE": EntityType.PHONE,
+    "IT_FISCAL_CODE": EntityType.TAX_CODE,
+    "IBAN_CODE": EntityType.IBAN,
+    "DATE_TIME": EntityType.BIRTH_DATE,
+    "BIRTH_DATE": EntityType.BIRTH_DATE,
+    "LOCATION": EntityType.ADDRESS,
+    "ADDRESS": EntityType.ADDRESS,
+    "IP_ADDRESS": EntityType.IP_ADDRESS,
+    "PERSON": EntityType.PERSON_NAME,
+    "PERSON_NAME": EntityType.PERSON_NAME,
+}
+
 
 def detect_with_presidio(
     source: SourceDocument,
@@ -20,7 +47,7 @@ def detect_with_presidio(
 ) -> list[DetectedEntity]:
     """Detect entities using Presidio Analyzer."""
     analyzer = AnalyzerEngine()
-    targets = list(entities) if entities else [entity.value for entity in EntityType]
+    targets = list(entities) if entities else list(_INTERNAL_TO_PRESIDIO.values())
 
     text = _flatten_source(source)
     results = analyzer.analyze(text=text, entities=targets, language="en")
@@ -48,12 +75,7 @@ def _flatten_source(source: SourceDocument) -> str:
 
 
 def _normalize_entity_type(name: str) -> EntityType:
-    if name in {"EMAIL_ADDRESS", "EMAIL"}:
-        return EntityType.EMAIL
-    if name in {"PHONE_NUMBER", "PHONE"}:
-        return EntityType.PHONE
-    if name == "IBAN_CODE":
-        return EntityType.IBAN
-    if name == "IT_FISCAL_CODE":
-        return EntityType.TAX_CODE
+    entity = _PRESIDIO_TO_INTERNAL.get(name)
+    if entity is not None:
+        return entity
     return EntityType(name)

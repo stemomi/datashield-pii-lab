@@ -286,7 +286,8 @@ def _handle_report(
         )
     )
 
-    _write_report(result.report, result.report_output_path, report_format)
+    report = _mark_report_only(result.report)
+    _write_report(report, result.report_output_path, report_format)
 
     print("Report generated.")
     print(f"Report file: {result.report_output_path}")
@@ -353,7 +354,8 @@ def _handle_db(
         )
     )
 
-    _write_report(result.report, result.report_output_path, report_format)
+    report = _mark_report_only(result.report)
+    _write_report(report, result.report_output_path, report_format)
 
     print("Database scan completed.")
     print(f"Report file: {result.report_output_path}")
@@ -368,9 +370,25 @@ def _update_report_paths(report: dict[str, Any] | str, output_path: Path) -> dic
     if not isinstance(report, dict):
         return report
     report["output_file"] = str(output_path)
+    report["sanitized_output_generated"] = True
     planned = report.get("planned_outputs")
     if isinstance(planned, dict):
         planned["sanitized_file"] = str(output_path)
+    return report
+
+
+def _mark_report_only(report: dict[str, Any] | str) -> dict[str, Any] | str:
+    """Clarify that report-only runs do not emit a sanitized file."""
+    if not isinstance(report, dict):
+        return report
+
+    report["output_file"] = None
+    report["sanitized_output_generated"] = False
+
+    planned = report.get("planned_outputs")
+    if isinstance(planned, dict):
+        planned["sanitized_file"] = None
+
     return report
 
 
@@ -446,3 +464,4 @@ def _write_csv(content: object, output_path: Path) -> None:
 
 if __name__ == "__main__":
     raise SystemExit(run())
+

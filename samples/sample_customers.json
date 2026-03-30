@@ -2,6 +2,9 @@
   {
     "record_id": 1,
     "full_name": "Mario Rossi",
+    "birth_date": "1985-06-14",
+    "address": "Via Roma 10",
+    "ip_address": "192.168.1.42",
     "email": "mario.rossi@gmail.com",
     "phone": "+39 3331234567",
     "tax_code": "RSSMRA85M01H501Z",
@@ -11,6 +14,9 @@
   {
     "record_id": 2,
     "full_name": "Anna Bianchi",
+    "birth_date": "1990-01-01",
+    "address": "Viale Europa 25",
+    "ip_address": "10.24.8.15",
     "email": "anna.bianchi@example.it",
     "phone": "+39 3477654321",
     "tax_code": "BNCNNA90A41F205X",
@@ -20,6 +26,9 @@
   {
     "record_id": 3,
     "full_name": "Luca Verdi",
+    "birth_date": "1988-12-10",
+    "address": "Piazza Garibaldi 7",
+    "ip_address": "172.16.4.77",
     "email": "luca.verdi@demo.local",
     "phone": "+39 3205557788",
     "tax_code": "VRDLCU88T10H501Q",

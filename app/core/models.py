@@ -15,12 +15,16 @@ FieldPath: TypeAlias = tuple[FieldPathPart, ...]
 
 
 class EntityType(StrEnum):
-    """Supported PII entity categories for the MVP."""
+    """Supported PII entity categories."""
 
     EMAIL = "EMAIL"
     PHONE = "PHONE"
     TAX_CODE = "TAX_CODE"
     IBAN = "IBAN"
+    BIRTH_DATE = "BIRTH_DATE"
+    ADDRESS = "ADDRESS"
+    IP_ADDRESS = "IP_ADDRESS"
+    PERSON_NAME = "PERSON_NAME"
 
 
 class SanitizationMode(StrEnum):
